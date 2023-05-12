@@ -8,7 +8,9 @@ RUN apt install pip -y
 
 RUN pip install cryptography
 
-COPY infection /root/
+RUN mkdir -p /root/infection
+
+COPY infection /root/infection
 
 COPY stockholm.py /
 
