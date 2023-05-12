@@ -25,8 +25,8 @@ The program will rename all the files in the mentioned folder adding the ".ft" e
 
 ### Example :
     # To encrypt all files inside $HOME/infection/
-    python3 stockholm
+    python3 stockholm.py
 
     # To decrypt
-    python3 stockholm -r $(cat ransom_key)
+    python3 stockholm.py -r $(cat ransom_key)
 
